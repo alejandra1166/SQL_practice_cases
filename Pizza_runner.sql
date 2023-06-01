@@ -87,6 +87,46 @@ Successful_orders: 4,3,1
 Runner_id: 1,2,3
 */
 
+--4. How many of each type of pizza was delivered?
+
+SELECT c_o.pizza_id, COUNT(c_o.pizza_id) AS Total_by_Type
+  FROM runner_orders AS r_o
+  INNER JOIN customer_orders AS c_o
+  ON r_o.order_id = c_o.order_id
+  WHERE NOT r_o.cancellation IN ('Restaurant Cancellation', 'Customer Cancellation')
+  GROUP BY c_o.pizza_id
+
+/*
+Pizza_id = 1, 2
+Total_by_Type = 9, 3
+*/
+
+-- 5. How many Vegetarian and Meatlovers were ordered by each customer?
+
+WITH cte_1
+AS(
+SELECT pizza_id, customer_id, COUNT(pizza_id) AS Total_Pizzas_Ordered
+FROM customer_orders
+GROUP BY pizza_id, customer_id
+)
+
+SELECT cte_1.customer_id, cte_1.Total_Pizzas_Ordered, pizza_names.pizza_name
+FROM cte_1
+INNER JOIN pizza_names
+ON pizza_names.pizza_id = cte_1.pizza_id
+ORDER BY cte_1.customer_id
+
+/*
+customer_id	Total_Pizzas_Ordered	pizza_name
+101	2	Meatlovers
+101	1	Vegetarian
+102	2	Meatlovers
+102	1	Vegetarian
+103	3	Meatlovers
+103	1	Vegetarian
+104	3	Meatlovers
+105	1	Vegetarian
+*/
 
 
 
