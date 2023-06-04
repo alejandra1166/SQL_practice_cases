@@ -127,6 +127,43 @@ customer_id	Total_Pizzas_Ordered	pizza_name
 104	3	Meatlovers
 105	1	Vegetarian
 */
+-- 6. What was the maximum number of pizzas delivered in a single order?
+ 
+SELECT customer_id, COUNT(customer_id) AS Pizzas_in_a_single_order
+FROM customer_orders AS co
+INNER JOIN runner_orders AS ru
+ON co.order_id = ru.order_id
+WHERE NOT ru.cancellation IN ('Restaurant Cancellation', 'Customer Cancellation')
+GROUP BY  customer_id, order_time
+ORDER BY  Pizzas_in_a_single_order DESC
+ 
+/*
+customer_id	Pizzas_in_a_single_order
+103	3
+104	2
+102	2
+102	1
+101	1
+101	1
+105	1
+104	1
+*/
+
+--7.For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
+
+SELECT customer_id, 
+       COUNT(CASE WHEN NOT COALESCE(extras, '') = '' 
+                    OR NOT COALESCE(exclusions, '') = '' THEN 1 END) AS num_with_changes,
+       COUNT(CASE WHEN COALESCE(extras, '') = ''
+                   AND COALESCE(exclusions, '') = '' THEN 1 END) AS num_with_no_changes
+FROM customer_orders co
+WHERE NOT EXISTS(SELECT 1 
+                 FROM runner_orders ro 
+                 WHERE co.order_id = ro.order_id 
+                   AND NOT COALESCE(cancellation, '') = '')
+GROUP BY customer_id
+
+
 
 
 
