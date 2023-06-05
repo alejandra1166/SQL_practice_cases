@@ -163,6 +163,47 @@ WHERE NOT EXISTS(SELECT 1
                    AND NOT COALESCE(cancellation, '') = '')
 GROUP BY customer_id
 
+/*
+customer_id	num_with_changes	num_with_no_changes
+101	0	2
+102	0	3
+103	3	0
+104	2	1
+105	1	0
+
+*/
+
+
+
+--8. How many pizzas were delivered that had both exclusions and extras?
+
+
+WITH cte_1
+AS(
+SELECT co.customer_id, 
+       COUNT(CASE WHEN NOT exclusions = '' THEN 0 END) AS with_exclusions
+	   ,COUNT(CASE WHEN NOT extras = '' THEN 0 END) AS  with_extras
+FROM customer_orders AS co
+WHERE NOT EXISTS(SELECT 1 
+                 FROM runner_orders ro 
+                 WHERE co.order_id = ro.order_id 
+                   AND NOT COALESCE(cancellation, '') = '')
+group by customer_id
+)
+Select customer_id
+		,COUNT(CASE WHEN with_exclusions != 0 AND with_extras != 0 THEN 0 END) AS with_exclusions_and_extras
+From cte_1
+group by customer_id
+ORDER BY with_exclusions_and_extras DESC
+
+/*
+customer_id	with_exclusions_and_extras
+104	1
+105	0
+101	0
+102	0
+103	0
+*/
 
 
 
