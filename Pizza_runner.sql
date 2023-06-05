@@ -222,4 +222,25 @@ FROM cte_1
 -- Avg_by_day : 0.097222
 
 
+-- 10. What was the volume of orders for each day of the week?
+
+WITH cte_1
+AS(
+SELECT  DATEPART(day,order_time) AS day_ordered, order_id
+FROM customer_orders
+)
+SELECT COUNT(order_id) AS number_of_orders, day_ordered
+FROM cte_1
+GROUP BY day_ordered
+
+/*
+number_of_orders	day_ordered
+2	1
+2	2
+3	4
+3	8
+1	9
+1	10
+2	11
+*/
 
