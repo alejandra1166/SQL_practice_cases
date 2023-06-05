@@ -206,5 +206,20 @@ customer_id	with_exclusions_and_extras
 */
 
 
+--9. What was the total volume of pizzas ordered for each hour of the day?
+
+
+WITH cte_1
+AS(
+SELECT COUNT(pizza_id) AS pizzas_ordered, DATEPART(HOUR,order_time) AS date_of_the_order
+FROM customer_orders
+GROUP BY DATEPART(HOUR,order_time)
+)
+SELECT avg(cast(pizzas_ordered AS DECIMAL(5,2))) /24 AS avg_by_hour
+FROM cte_1
+
+
+-- Avg_by_day : 0.097222
+
 
 
