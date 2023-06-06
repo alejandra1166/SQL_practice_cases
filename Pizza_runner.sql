@@ -288,3 +288,31 @@ runner_id	avg_time
 2	23
 3	10
 */
+
+
+--3. Is there any relationship between the number of pizzas and how long the order takes to prepare?
+
+
+WITH cte_1
+AS(
+SELECT co.order_id, (ru.pickup_time - co.order_time) as prep_time, 
+		COUNT(pizza_id) OVER (partition by co.order_id )  AS pizzas_per_order
+FROM runner_orders as ru
+INNER JOIN customer_orders as co
+ON ru.order_id = co.order_id
+WHERE NOT EXISTS  (SELECT 1 
+		from runner_orders ru  
+		WHERE co.order_id = ru.order_id AND NOT COALESCE(cancellation, '') = '')
+
+)
+
+SELECT AVG(DATEPART(MINUTE,prep_time)) as prep_time_minutes, pizzas_per_order
+FROM cte_1
+group by pizzas_per_order
+
+/*
+prep_time_minutes	pizzas_per_order
+12	1
+18	2
+29	3
+*/
