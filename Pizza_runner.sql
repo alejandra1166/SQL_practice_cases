@@ -316,3 +316,21 @@ prep_time_minutes	pizzas_per_order
 18	2
 29	3
 */
+
+
+--4. What was the average distance traveled for each customer?
+
+SELECT co.customer_id, AVG(ru.distance) AS avg_distance_by_customer_in_Km
+  FROM runner_orders AS ru 
+	inner JOIN customer_orders co
+	ON ru.order_id = co.order_id 
+group by co.customer_id
+
+/*
+customer_id	avg_distance_by_customer_in_Km
+101	20.000000
+102	16.733333
+103	23.400000
+104	10.000000
+105	25.000000
+*/
