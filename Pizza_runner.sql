@@ -55,7 +55,7 @@ SET extras = NULL
 WHERE extras = 'null'
 
 --ANSWERING QUESTIONS
---PIZZA METRICS
+--1. PIZZA METRICS
 
 --1. How many pizzas were ordered?
 
@@ -244,3 +244,47 @@ number_of_orders	day_ordered
 2	11
 */
 
+--B. Runner and Customer Experience
+
+--1. How many runners signed up for each 1 week period? (i.e. week starts 2021-01-01)
+
+WITH cte_1
+AS(
+SELECT DATEPART(WEEK, registration_date) AS weeks, runner_id
+FROM runners
+)
+
+SELECT weeks, COUNT(runner_id) AS number_of_runners_signed_up
+FROM cte_1
+GROUP BY weeks
+
+/*
+weeks	runners_signed_up
+1	1
+2	2
+3	1
+*/
+
+
+--2. What was the average time in minutes it took for each runner to arrive at the Pizza Runner HQ to pickup the order?
+
+
+WITH cte_1
+AS(
+SELECT ru.runner_id, (ru.pickup_time - co.order_time) as total_time
+FROM runner_orders as ru
+INNER JOIN customer_orders as co
+ON ru.order_id = co.order_id
+)
+
+SELECT runner_id, (AVG(DATEPART(MINUTE, total_time))) AS avg_time
+FROM cte_1
+group by runner_id
+
+
+/*
+runner_id	avg_time
+1	15
+2	23
+3	10
+*/
