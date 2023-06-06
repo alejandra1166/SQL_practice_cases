@@ -334,3 +334,11 @@ customer_id	avg_distance_by_customer_in_Km
 104	10.000000
 105	25.000000
 */
+
+
+--4.What was the difference between the longest and shortest delivery times for all orders?
+
+SELECT (MAX(CAST(duration as INT))) - (MIN(CAST(duration as INT))) AS total_difference
+FROM runner_orders
+
+-- total_difference = 30 min
