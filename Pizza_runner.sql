@@ -35,14 +35,17 @@ UPDATE runner_orders
 SET duration = SUBSTRING(duration, 1, 2)
 WHERE duration like'%min%'
 
+ALTER TABLE runner_orders 
+ALTER COLUMN duration DECIMAL(5,2)
+
+--cancellation
+
 UPDATE runner_orders
 SET cancellation = NULL 
 where cancellation = 'null'
 
 UPDATE runner_orders
 SET cancellation = ISNULL(cancellation,'')
-
-
 
 -- exclusions and extras
 
