@@ -368,3 +368,35 @@ order_id	runner_id	avg_speed
 */
 
 
+--7. What is the successful delivery percentage for each runner?
+
+
+WITH cte_1
+AS (
+SELECT runner_id, (COUNT(runner_id))*100 AS percentages
+		FROM runner_orders 
+		WHERE cancellation = ''
+		group by runner_id
+		)
+SELECT cte_1.runner_id, (percentages/(COUNT(ru.cancellation))) as percentages_successful_deliveries
+FROM cte_1
+full JOIN runner_orders AS ru
+on cte_1.runner_id = ru.runner_id
+group by cte_1.runner_id, cte_1.percentages
+order by runner_id
+
+
+SHORTER ANSWER SOMEONE IN STACKOVERFLOW.COM SHOWED ME:
+
+select runner_id,
+       count(case when cancellation = '' then 1 end) *100 / count(*) as percentage
+from runner_orders
+group by runner_id
+order by runner_id
+
+/*
+runner_id	percentages_successful_deliveries
+1	100
+2	75
+3	50
+*/
