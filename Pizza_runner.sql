@@ -339,9 +339,32 @@ customer_id	avg_distance_by_customer_in_Km
 */
 
 
---4.What was the difference between the longest and shortest delivery times for all orders?
+--5.What was the difference between the longest and shortest delivery times for all orders?
 
 SELECT (MAX(CAST(duration as INT))) - (MIN(CAST(duration as INT))) AS total_difference
 FROM runner_orders
 
 -- total_difference = 30 min
+
+--6. What was the average speed for each runner for each delivery and do you notice any trend for these values?
+ 
+
+SELECT order_id, runner_id, AVG(distance/duration) AS avg_speed
+FROM runner_orders
+where cancellation = ''
+group by order_id, runner_id
+ORDER BY order_id
+
+/*
+order_id	runner_id	avg_speed
+1	1	0.62500000
+2	1	0.74074074
+3	1	0.67000000
+4	2	0.58500000
+5	3	0.66666666
+7	2	1.00000000
+8	2	1.56000000
+10	1	1.00000000
+*/
+
+
