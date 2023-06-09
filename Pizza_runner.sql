@@ -400,3 +400,20 @@ runner_id	percentages_successful_deliveries
 2	75
 3	50
 */
+
+--C. Ingredient Optimisation
+
+--1.What are the standard ingredients for each pizza?
+select pizza_id, string_agg(cast(topping_name as varchar),',') as ingredients
+from pizza_recipes
+inner join pizza_toppings 
+on topping_id in (select [value] 
+					from string_split(cast(toppings as varchar), ','))
+group by pizza_id
+
+/*
+pizza_id	ingredients
+1	Bacon,BBQ Sauce,Beef,Cheese,Chicken,Mushrooms,Pepperoni,Salami
+2	Cheese,Mushrooms,Onions,Peppers,Tomatoes,Tomato Sauce
+*/
+
