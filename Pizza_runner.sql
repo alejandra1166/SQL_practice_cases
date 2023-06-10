@@ -438,3 +438,25 @@ Cheese	1
 Chicken	1
 */
  
+ --3. What was the most common exclusion?
+
+WITH cte1
+as(
+SELECT trim(VALUE) AS list_of_exclusions
+FROM customer_orders
+	CROSS APPLY string_split((exclusions), ',') 
+WHERE VALUE <> ''
+--GROUP BY value
+)
+SELECT topping_name, COUNT(list_of_exclusions) AS count_of_exclusions
+FROM cte1
+INNER JOIN pizza_toppings as pizza
+on cte1.list_of_exclusions = pizza.topping_id
+group by list_of_exclusions, topping_name
+
+/*
+topping_name	count_of_exclusions
+BBQ Sauce	1
+Cheese	4
+Mushrooms	1
+*/
