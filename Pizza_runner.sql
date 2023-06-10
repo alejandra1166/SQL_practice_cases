@@ -417,3 +417,24 @@ pizza_id	ingredients
 2	Cheese,Mushrooms,Onions,Peppers,Tomatoes,Tomato Sauce
 */
 
+--2. What was the most commonly added extra?
+WITH cte1
+as(
+SELECT trim(VALUE) AS list_of_extras
+FROM customer_orders
+	CROSS APPLY string_split((extras), ',') 
+WHERE VALUE <> ''
+--GROUP BY value
+)
+SELECT topping_name, COUNT(list_of_extras) AS count_of_extras
+FROM cte1
+INNER JOIN pizza_toppings as pizza
+on cte1.list_of_extras = pizza.topping_id
+group by list_of_extras, topping_name
+ /*
+ topping_name	count_of_extras
+Bacon	4
+Cheese	1
+Chicken	1
+*/
+ 
