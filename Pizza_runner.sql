@@ -460,3 +460,74 @@ BBQ Sauce	1
 Cheese	4
 Mushrooms	1
 */
+
+--4. 
+select order_id, concat(name, extras, exclusions) name
+from (
+  select co.order_id, pn.pizza_name name, 
+         (select ' - Extra '+ string_agg(pt.topping_name, ', ') 
+          from string_split(extras, ',')
+          join pizza_toppings pt on value = pt.topping_id) extras,
+         (select ' - Exclude ' + string_agg(pt.topping_name, ', ') 
+          from string_split(exclusions, ',') 
+          join pizza_toppings pt on value = pt.topping_id) exclusions
+  from customer_orders co join pizza_names pn on co.pizza_id = pn.pizza_id) o
+
+
+
+
+--5. Generate an alphabetically ordered comma separated ingredient list for each pizza order from the customer_orders table and add a 2x in front of any relevant ingredients
+For example: "Meat Lovers: 2xBacon, Beef, ... , Salami"
+
+SELECT CONCAT(pizza_name + ':', 
+    (SELECT toppings_per_recipe
+    FROM
+            (SELECT string_agg(topping_name, ', ') as toppings_per_recipe
+            FROM pizza_recipes as pr
+            cross apply string_split(pr.toppings, ',')
+            JOIN pizza_toppings AS pt
+            ON topping_id = VALUE GROUP BY pr.pizza_id)as o))
+FROM customer_orders AS co 
+    JOIN pizza_names AS pn
+    ON co.pizza_id = pn.pizza_id
+
+
+SELECT CONCAT(pizza_name, ':', toppings_per_recipe)
+FROM customer_orders AS co 
+JOIN pizza_names AS pn
+ ON co.pizza_id = pn.pizza_id
+    JOIN (
+      SELECT pr.pizza_id,
+        string_agg(topping_name, ', ') within group (order by topping_name) as toppings_per_recipe
+FROM pizza_recipes as pr 
+cross apply string_split(pr.toppings, ',')
+          JOIN pizza_toppings AS pt 
+ON topping_id = VALUE
+      GROUP BY pr.pizza_id
+    ) as pizza_desc 
+     ON pizza_desc.pizza_id = pn.pizza_id;
+
+
+
+--6. What is the total quantity of each ingredient used in all delivered pizzas sorted by most frequent first?
+
+
+
+
+select  order_id, extras_split, toppings_split, exclusions_split
+from
+		(SELECT value as extras_split, order_id, pizza_id 
+		FROM customer_orders 
+		cross apply string_split(extras, ','))as a
+		JOIN (
+		SELECT value as toppings_split, pizza_id
+		FROM pizza_recipes cross apply string_split(toppings, ',')) as b
+		ON a.pizza_id = b.pizza_id
+		JOIN (
+		SELECT value as exclusions_split, pizza_id
+		FROM customer_orders 
+		cross apply string_split(exclusions, ',')) as c
+		ON b.pizza_id = c.pizza_id
+group by  order_id, extras_split, toppings_split, exclusions_split
+order by order_id
+
